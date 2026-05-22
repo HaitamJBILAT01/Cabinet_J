@@ -1,0 +1,176 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nouveau Dossier - Cabinet JBILAT{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    .form-wrapper {
+        padding-top: 10px;
+        padding-bottom: 30px;
+    }
+
+    .form-luxe {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+        padding: 25px 45px; /* Nqesna padding l-te7t bash n-tl3o l-boutons */
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ede9e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        background-color: #fcfbf9;
+        transition: all 0.2s ease;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 0.25rem rgba(184, 147, 90, 0.15);
+        background-color: #fff;
+    }
+    
+    label {
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin-bottom: 6px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Select2 Fixes */
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ede9e1;
+        border-radius: 8px;
+        height: 42px;
+        background-color: #fcfbf9;
+        display: flex;
+        align-items: center;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: var(--gold);
+        background-color: #fff;
+    }
+    
+    textarea.form-control {
+        min-height: 80px; 
+    }
+
+    /* 🎨 LOUN DHBI ROYAL LI KAY-POPUP (White text on Deep Gold) */
+    .btn-submit-luxe {
+        background: linear-gradient(135deg, #b8935a 0%, #96733f 100%);
+        color: #ffffff !important; /* Ktaba b l-byed nase7 bash t-ban */
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(184, 147, 90, 0.2);
+    }
+    .btn-submit-luxe:hover {
+        transform: translateY(-1px);
+        background: linear-gradient(135deg, #96733f 0%, #75562d 100%);
+        box-shadow: 0 5px 15px rgba(184, 147, 90, 0.4) !important;
+    }
+
+    .btn-cancel-luxe {
+        background: #f8f9fa;
+        color: var(--ink-soft);
+        border: 1px solid #ede9e1;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-cancel-luxe:hover {
+        background: rgba(192, 81, 74, 0.08);
+        color: #c0514a !important;
+        border-color: rgba(192, 81, 74, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 form-wrapper fade-up" style="animation: fadeIn 0.5s ease;">
+    
+    <div class="mb-4 text-center">
+        {% if is_update %}
+            <h2 class="brand-font fw-bold mb-1" style="color: var(--ink); font-size: 2.2rem;">Modifier le Dossier</h2>
+            <p class="text-muted" style="font-size: 0.9rem;">Mettez à jour les informations de l'affaire.</p>
+        {% else %}
+            <h2 class="brand-font fw-bold mb-1" style="color: var(--ink); font-size: 2.2rem;">Ouvrir un Nouveau Dossier</h2>
+        {% endif %}
+    </div>
+
+    <div class="form-luxe border-top border-3" style="border-color: var(--gold) !important;">
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="row mb-2">
+                <div class="col-md-6 mb-3">
+                    {{ form.titre|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.client|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 mb-3">
+                    {{ form.type_affaire|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.statut|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 mb-3">
+                    {{ form.partie_adverse|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.tribunal|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-12 mb-2">
+                    {{ form.description|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-3 mt-2 pt-3 border-top" style="border-color: #ede9e1 !important;">
+                <a href="{% url 'dossier_list' %}" class="btn btn-cancel-luxe px-4 shadow-sm" style="border-radius: 8px;">
+                    <i class="fa-solid fa-xmark me-1"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-submit-luxe px-4 shadow-sm" style="border-radius: 8px;">
+                    <i class="fa-solid {% if is_update %}fa-floppy-disk{% else %}fa-check{% endif %} me-2"></i> 
+                    {% if is_update %}Sauvegarder les modifications{% else %}Enregistrer le dossier{% endif %}
+                </button>
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#id_client').select2({
+            placeholder: "Sélectionner ou rechercher un client...",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

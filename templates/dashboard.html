@@ -1,0 +1,200 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Tableau de Bord - Cabinet JBILAT{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hover-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .hover-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.06) !important; }
+    .kpi-number { font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -1px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="d-flex justify-content-end mb-4">
+        <div class="text-secondary fw-medium d-flex align-items-center" style="font-size: 0.9rem;">
+            <i class="fa-regular fa-calendar-days me-2" style="color: var(--gold);"></i>
+            <span id="js-date"></span>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-xl-3 col-md-6">
+            <a href="{% url 'dossier_list' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card border-top border-3" style="border-color: var(--ink) !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size:0.7rem;letter-spacing:1px;">Dossiers</span>
+                        <i class="fa-solid fa-folder-open fs-5" style="color: var(--ink);"></i>
+                    </div>
+                    <h2 class="mb-0 kpi-number" style="color: var(--ink); font-size: 2.5rem;">{{ total_dossiers }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{% url 'dossier_list' %}?statut=En+cours" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card border-top border-3" style="border-color: var(--gold) !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size:0.7rem;letter-spacing:1px;">En Cours</span>
+                        <i class="fa-solid fa-spinner fs-5" style="color: var(--gold);"></i>
+                    </div>
+                    <h2 class="mb-0 kpi-number" style="color: var(--gold); font-size: 2.5rem;">{{ dossiers_en_cours }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{% url 'client_list' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card border-top border-3" style="border-color: #4a6b5a !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size:0.7rem;letter-spacing:1px;">Clients</span>
+                        <i class="fa-solid fa-users fs-5" style="color: #4a6b5a;"></i>
+                    </div>
+                    <h2 class="mb-0 kpi-number" style="color: #4a6b5a; font-size: 2.5rem;">{{ total_clients }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{% url 'audience_list' %}?filtre=a_venir" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card border-top border-3" style="border-color: #c0514a !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size:0.7rem;letter-spacing:1px;">Audiences à venir</span>
+                        <i class="fa-solid fa-gavel fs-5" style="color: #c0514a;"></i>
+                    </div>
+                    <h2 class="mb-0 kpi-number" style="color: #c0514a; font-size: 2.5rem;">{{ total_audiences }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Dossiers Récents -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-bottom-0 p-4 d-flex justify-content-between align-items-center">
+                    <h5 class="brand-font fw-bold mb-0" style="color: var(--ink); font-size: 1.5rem;">Dossiers Récents</h5>
+                    <a href="{% url 'dossier_list' %}" class="text-decoration-none fw-medium" style="color: var(--gold); font-size: 0.9rem;">
+                        Voir tout <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-uppercase text-secondary" style="font-size: 0.72rem;">
+                                <tr>
+                                    <th class="ps-4 py-3">N°</th>
+                                    <th class="py-3">Titre</th>
+                                    <th class="py-3">Client</th>
+                                    <th class="py-3">Statut</th>
+                                    <th class="text-end pe-4 py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dossier in dossiers_recents %}
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold kpi-number" style="color: var(--gold); font-size: 0.9rem;">#{{ dossier.id }}</td>
+                                    <td class="py-3 fw-medium" style="color: var(--ink);">{{ dossier.titre }}</td>
+                                    <td class="py-3 text-muted" style="font-size:0.85rem;">{{ dossier.client }}</td>
+                                    <td class="py-3">
+                                        <span class="badge rounded-pill {% if dossier.statut == 'En cours' %}bg-success bg-opacity-10 text-success{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %} fw-medium px-3 py-2">
+                                            {{ dossier.statut }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4 py-3">
+                                        <a href="{% url 'dossier_detail' dossier.id %}" class="btn btn-sm btn-light rounded-3" style="color: var(--gold);">
+                                            <i class="fa-solid fa-chevron-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-secondary fst-italic">Aucun dossier pour le moment.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar droite -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-4 h-100">
+
+                <!-- Actions rapides -->
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="brand-font fw-bold mb-4" style="color: var(--ink); font-size: 1.4rem;">Actions Rapides</h5>
+                    <a href="{% url 'dossier_create' %}" class="btn btn-cabinet w-100 d-flex align-items-center p-3 mb-3 text-start border-0 shadow-sm" style="border-radius:10px;">
+                        <div class="bg-white rounded d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;color:var(--ink);">
+                            <i class="fa-solid fa-folder-plus"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold mb-0" style="font-size: 0.92rem;">Nouveau Dossier</span>
+                            <span class="text-white-50" style="font-size: 0.75rem;">Créer un dossier client</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'client_create' %}" class="btn btn-light w-100 d-flex align-items-center p-3 mb-3 text-start border" style="border-radius:10px;">
+                        <div class="rounded d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;background:rgba(184,147,90,0.1);color:var(--gold);">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold mb-0" style="color:var(--ink);font-size:0.92rem;">Nouveau Client</span>
+                            <span class="text-secondary" style="font-size: 0.75rem;">Enregistrer un client</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'audience_create' %}" class="btn btn-light w-100 d-flex align-items-center p-3 text-start border" style="border-radius:10px;">
+                        <div class="rounded d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;background:rgba(192,81,74,0.08);color:#c0514a;">
+                            <i class="fa-solid fa-gavel"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold mb-0" style="color:var(--ink);font-size:0.92rem;">Planifier une Audience</span>
+                            <span class="text-secondary" style="font-size: 0.75rem;">Ajouter au calendrier</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Prochaines audiences -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 flex-grow-1" style="background-color: var(--ink); color: white; position:relative;overflow:hidden;">
+                    <i class="fa-solid fa-gavel position-absolute" style="font-size:8rem;right:-20px;bottom:-20px;color:rgba(255,255,255,0.04);"></i>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-uppercase fw-bold" style="color: var(--gold); font-size: 0.68rem; letter-spacing: 1.5px;">Prochaines Audiences</span>
+                        <a href="{% url 'audience_list' %}?filtre=a_venir" style="color:rgba(255,255,255,0.4);font-size:0.78rem;text-decoration:none;">
+                            Voir tout <i class="fa-solid fa-arrow-right ms-1" style="font-size:0.7rem;"></i>
+                        </a>
+                    </div>
+                    {% for aud in prochaines_audiences %}
+                    <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom border-light border-opacity-10{% endif %}">
+                        <div class="fw-bold" style="font-size:0.88rem;color:white;">{{ aud.tribunal }}</div>
+                        <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">
+                            {{ aud.dossier.client }} — {{ aud.date_audience|date:"d M Y à H:i" }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <h5 class="brand-font fw-bold mb-1 text-white-50" style="margin-top:8px;">Aucune audience à venir</h5>
+                    <p class="mb-0" style="font-size: 0.82rem; color:rgba(255,255,255,0.35);">Votre calendrier est libre.</p>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const d = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('js-date').textContent = d.toLocaleDateString('fr-FR', opts);
+</script>
+{% endblock %}

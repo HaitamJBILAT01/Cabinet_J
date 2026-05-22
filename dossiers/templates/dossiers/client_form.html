@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nouveau Client - Cabinet JBILAT{% endblock %}
+
+{% block content %}
+<style>
+    .form-luxe {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+        padding: 30px 45px;
+        max-width: 800px;
+        margin: 0 auto;
+        border-top: 3px solid var(--gold);
+    }
+    .btn-submit-luxe {
+        background: linear-gradient(135deg, #b8935a 0%, #96733f 100%); 
+        color: #ffffff !important;
+        border: none; 
+        font-weight: 600; 
+        transition: all 0.3s ease; 
+        box-shadow: 0 3px 10px rgba(184, 147, 90, 0.2);
+    }
+    .btn-submit-luxe:hover { 
+        transform: translateY(-1px); 
+        box-shadow: 0 5px 15px rgba(184, 147, 90, 0.4) !important; 
+    }
+</style>
+
+<div class="container-fluid p-0 fade-up" style="animation: fadeIn 0.5s ease; padding-top: 15px; padding-bottom: 40px;">
+    
+    <div class="mb-4 text-center">
+        <h2 class="brand-font fw-bold mb-1" style="color: var(--ink); font-size: 2.2rem;">
+            {% if is_update %}Modifier le Client{% else %}Ajouter un Client{% endif %}
+        </h2>
+    </div>
+
+    <div class="form-luxe">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <h6 class="mb-3 fw-bold text-muted">Informations Personnelles</h6>
+            <div class="row mb-2">
+                <div class="col-md-6 mb-3">{{ form.prenom|as_crispy_field }}</div>
+                <div class="col-md-6 mb-3">{{ form.nom|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="mb-3 fw-bold text-muted mt-2">Contact & Coordonnées</h6>
+            <div class="row mb-2">
+                <div class="col-md-6 mb-3">{{ form.telephone|as_crispy_field }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 mb-3">{{ form.adresse|as_crispy_field }}</div>
+            </div>
+            
+            <h6 class="mb-3 fw-bold text-muted mt-2">Pièces Jointes</h6>
+            <div class="row mb-1">
+                <div class="col-12 mb-2">{{ form.photo_cin|as_crispy_field }}</div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top" style="border-color: #ede9e1 !important;">
+                <a href="{% url 'client_list' %}" class="btn btn-light border px-4 shadow-sm" style="border-radius: 8px; font-weight: 500;">Annuler</a>
+                <button type="submit" class="btn btn-submit-luxe px-4 shadow-sm" style="border-radius: 8px;">
+                    <i class="fa-solid fa-user-check me-2"></i> 
+                    {% if is_update %}Mettre à jour{% else %}Enregistrer{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

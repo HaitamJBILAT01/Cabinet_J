@@ -1,0 +1,440 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<style>
+    :root {
+        --text-primary: #1d1d1f;
+        --text-secondary: #737373;
+        --bg-card: #F5F2EC;
+        --border-color: #e5e0d8;
+    }
+    .dossier-wrapper {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        padding: 0 0 80px 0;
+        color: var(--text-primary);
+    }
+    .btn-retour {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 12px;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .btn-retour:hover { color: var(--text-primary); transform: translateX(-4px); }
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-family: 'Cormorant Garamond', serif;
+    }
+    .badge-minimal {
+        background-color: rgba(255,255,255,0.4);
+        color: var(--text-primary);
+        border: 1px solid rgba(0,0,0,0.06);
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+    .premium-card {
+        background-color: var(--bg-card);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+        border: 1px solid var(--border-color);
+    }
+    .card-heading {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .info-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    .info-group { display: flex; flex-direction: column; }
+    .info-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px; }
+    .info-value { font-size: 14px; color: var(--text-primary); font-weight: 500; line-height: 1.5; }
+    .doc-item, .intervention-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .doc-item:last-child, .intervention-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .doc-title { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+    .btn-premium {
+        background-color: var(--text-primary);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        height: 40px;
+        padding: 0 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-premium:hover { background-color: #000; color: #fff; transform: translateY(-1px); }
+    .btn-card-action {
+        background-color: var(--text-primary);
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        height: 32px;
+        padding: 0 14px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    .btn-card-action:hover { background-color: #000; color: #fff; transform: translateY(-1px); }
+    .btn-outline {
+        background-color: #ffffff;
+        color: var(--text-primary);
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        height: 34px;
+        padding: 0 14px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+    .btn-outline:hover { border-color: var(--text-primary); color: var(--text-primary); }
+    .btn-edit-luxe {
+        background-color: #ffffff;
+        color: #4a4a4a;
+        border: 1px solid #ede9e1;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .btn-edit-luxe:hover {
+        background-color: #fcfbf9;
+        border-color: var(--gold);
+        color: var(--gold);
+        transform: translateY(-2px);
+    }
+    .btn-delete-luxe {
+        background-color: #fff1f0;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .btn-delete-luxe:hover { background-color: #fee2e2; color: #dc2626; transform: translateY(-2px); }
+    .intervention-date { font-size: 0.75rem; color: var(--text-secondary); }
+</style>
+
+<div class="dossier-wrapper">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+            <div class="mb-3 mb-md-0">
+                <a href="{% url 'dossier_list' %}" class="btn-retour text-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Retour aux dossiers
+                </a>
+                <h1 class="page-title">{{ dossier.titre }}</h1>
+                <div class="d-flex gap-2 align-items-center mt-2">
+                    <span class="badge-minimal px-3 py-1 bg-white border shadow-sm">
+                        {% if dossier.statut == 'En cours' %}
+                            <span class="d-inline-block rounded-circle me-1" style="width:8px;height:8px;background:#10b981;box-shadow:0 0 4px rgba(16,185,129,0.4);"></span>
+                        {% elif dossier.statut == 'Clôturé' %}
+                            <span class="d-inline-block rounded-circle me-1" style="width:8px;height:8px;background:#ef4444;"></span>
+                        {% else %}
+                            <span class="d-inline-block rounded-circle me-1" style="width:8px;height:8px;background:#9ca3af;"></span>
+                        {% endif %}
+                        {{ dossier.statut }}
+                    </span>
+                    <span class="badge-minimal px-3 py-1 bg-light border">
+                        <i class="fa-solid fa-scale-unbalanced me-1" style="color:var(--gold);"></i>
+                        {{ dossier.get_type_affaire_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'dossier_update' dossier.id %}" class="btn-edit-luxe shadow-sm">
+                    <i class="fa-solid fa-pen me-2"></i> Modifier
+                </a>
+                {% if request.user.role == 'Avocat' %}
+                <a href="{% url 'dossier_delete' dossier.id %}" class="btn-delete-luxe shadow-sm">
+                    <i class="fa-solid fa-trash me-2"></i> Supprimer
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Colonne gauche: infos + détails -->
+            <div class="col-lg-4">
+                <div class="premium-card">
+                    <h2 class="card-heading">Informations Client</h2>
+                    <div class="info-grid">
+                        <div class="info-group">
+                            <span class="info-label">Identité</span>
+                            <a href="{% url 'client_detail' dossier.client.pk %}" class="info-value text-decoration-none" style="font-weight:600;font-size:15px;color:var(--text-primary);">
+                                {{ dossier.client }}
+                            </a>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Téléphone</span>
+                            <span class="info-value">{{ dossier.client.telephone|default:"Non renseigné" }}</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Adresse</span>
+                            <span class="info-value">{{ dossier.client.adresse|default:"Non renseignée" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card">
+                    <h2 class="card-heading">Détails de l'Affaire</h2>
+                    <div class="info-grid">
+                        <div class="info-group">
+                            <span class="info-label">Partie Adverse</span>
+                            <span class="info-value">{{ dossier.partie_adverse|default:"Non définie" }}</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Tribunal Compétent</span>
+                            <span class="info-value">{{ dossier.tribunal|default:"Non défini" }}</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <span class="info-value">{{ dossier.date_creation|date:"d F Y" }}</span>
+                        </div>
+                        {% if dossier.description %}
+                        <div class="info-group mt-2">
+                            <span class="info-label">Résumé des Faits</span>
+                            <span class="info-value" style="font-size:13.5px;color:var(--text-secondary);background:rgba(0,0,0,0.02);padding:12px;border-radius:8px;">
+                                {{ dossier.description }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Audiences liées -->
+                <div class="premium-card">
+                    <h2 class="card-heading d-flex justify-content-between align-items-center m-0 pb-3 mb-4" style="border-bottom: 1px solid var(--border-color);">
+                        <span>Audiences</span>
+                        <a href="{% url 'audience_create' %}?dossier={{ dossier.pk }}" class="btn-card-action text-decoration-none">
+                            <i class="fa-solid fa-plus" style="font-size:12px;"></i> Ajouter
+                        </a>
+                    </h2>
+                    {% for aud in dossier.audiences.all %}
+                    <div class="doc-item">
+                        <div>
+                            <div class="doc-title" style="font-size:13px;">
+                                <i class="fa-solid fa-gavel" style="color:var(--gold);font-size:12px;"></i>
+                                {{ aud.tribunal }}{% if aud.salle %} — Salle {{ aud.salle }}{% endif %}
+                            </div>
+                            <div class="intervention-date mt-1">
+                                <i class="fa-regular fa-calendar me-1"></i>{{ aud.date_audience|date:"d/m/Y à H:i" }}
+                            </div>
+                            {% if aud.notes %}<div class="intervention-date mt-1" style="font-style:italic;">{{ aud.notes|truncatechars:60 }}</div>{% endif %}
+                        </div>
+                        <a href="{% url 'audience_update' aud.pk %}" class="btn-outline" style="height:28px;font-size:12px;padding:0 10px;">Modifier</a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-3" style="font-size:0.85rem;font-style:italic;">Aucune audience planifiée.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Colonne droite: documents + interventions -->
+            <div class="col-lg-8">
+
+                <!-- Documents -->
+                <div class="premium-card">
+                    <h2 class="card-heading d-flex justify-content-between align-items-center m-0 pb-3 mb-4" style="border-bottom: 1px solid var(--border-color);">
+                        <span>Documents Joints</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge text-dark border" style="font-weight:500;background-color:#fff !important;font-size:12px;padding:6px 10px;">
+                                {{ dossier.documents.count }} Fichier(s)
+                            </span>
+                            <button type="button" class="btn-card-action" data-bs-toggle="modal" data-bs-target="#importerModal">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size:12px;"></i> Importer
+                            </button>
+                        </div>
+                    </h2>
+                    <div class="documents-list">
+                        {% for doc in dossier.documents.all %}
+                        <div class="doc-item">
+                            <span class="doc-title">
+                                <i class="fa-solid fa-file-lines" style="color:#ef4444;"></i>
+                                {{ doc.titre }}
+                                <span class="text-muted" style="font-size:0.75rem;">— {{ doc.date_creation|date:"d/m/Y" }}</span>
+                            </span>
+                            <div class="d-flex gap-2">
+                                {% if doc.fichier and doc.fichier.name %}
+                                <a href="{{ doc.fichier.url }}" target="_blank" class="btn-outline">Ouvrir</a>
+                                {% endif %}
+                                <form action="{% url 'supprimer_document' doc.pk %}" method="POST" onsubmit="return confirm('Supprimer ce document ?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-outline" style="color:#ef4444;border-color:#fecaca;height:34px;">
+                                        <i class="fa-solid fa-trash" style="font-size:11px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-folder-open fa-2x mb-2" style="opacity:0.12;"></i>
+                            <p class="text-muted mb-0" style="font-size:0.88rem;font-style:italic;">Aucun document associé à cette affaire.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Interventions -->
+                <div class="premium-card">
+                    <h2 class="card-heading d-flex justify-content-between align-items-center m-0 pb-3 mb-4" style="border-bottom: 1px solid var(--border-color);">
+                        <span>Interventions</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge text-dark border" style="font-weight:500;background-color:#fff !important;font-size:12px;padding:6px 10px;">
+                                {{ dossier.interventions.count }}
+                            </span>
+                            <button type="button" class="btn-card-action" data-bs-toggle="modal" data-bs-target="#interventionModal">
+                                <i class="fa-solid fa-plus" style="font-size:12px;"></i> Ajouter
+                            </button>
+                        </div>
+                    </h2>
+                    <div class="interventions-list">
+                        {% for inv in dossier.interventions.all|dictsortreversed:"date_intervention" %}
+                        <div class="intervention-item" style="align-items:flex-start;flex-direction:column;gap:8px;">
+                            <div class="d-flex justify-content-between w-100 align-items-center">
+                                <div class="doc-title">
+                                    <i class="fa-solid fa-circle-dot" style="color:var(--gold);font-size:10px;margin-top:3px;"></i>
+                                    <span style="font-weight:600;">{{ inv.titre }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="intervention-date">{{ inv.date_intervention|date:"d/m/Y à H:i" }}</span>
+                                    <form action="{% url 'supprimer_intervention' inv.pk %}" method="POST" onsubmit="return confirm('Supprimer cette intervention ?')">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none;border:none;padding:0;color:#9ca3af;cursor:pointer;font-size:12px;" title="Supprimer">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p class="mb-0" style="font-size:13.5px;color:var(--text-secondary);padding-left:22px;line-height:1.6;">{{ inv.description }}</p>
+                            {% if inv.document_joint %}
+                            <a href="{{ inv.document_joint.url }}" target="_blank" class="btn-outline" style="margin-left:22px;height:28px;font-size:12px;padding:0 10px;">
+                                <i class="fa-solid fa-paperclip me-1"></i>Pièce jointe
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-clipboard fa-2x mb-2" style="opacity:0.12;"></i>
+                            <p class="text-muted mb-0" style="font-size:0.88rem;font-style:italic;">Aucune intervention enregistrée.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Importer Document -->
+<div class="modal fade" id="importerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 10px 40px rgba(0,0,0,0.08);">
+        <div class="modal-header" style="border-bottom:1px solid var(--border-color);padding:24px 32px;">
+          <h5 class="modal-title" style="font-weight:600;font-size:18px;">Nouveau Document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{% url 'importer_document' dossier.pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body" style="padding:32px;">
+                <div class="mb-4">
+                    <label class="info-label" style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Titre du document</label>
+                    <input type="text" name="titre" class="form-control" placeholder="Ex: CIN, Jugement, Contrat..." required style="border-radius:8px;border:1px solid var(--border-color);padding:12px 16px;font-size:14px;">
+                </div>
+                <div>
+                    <label class="info-label" style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Fichier (PDF, Image...)</label>
+                    <input type="file" name="fichier" class="form-control" style="border-radius:8px;border:1px solid var(--border-color);padding:10px 16px;font-size:14px;">
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--border-color);padding:20px 32px;">
+              <button type="button" class="btn-outline" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" class="btn-premium" style="height:40px;margin-left:12px;">Enregistrer</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+<!-- Modal: Ajouter Intervention -->
+<div class="modal fade" id="interventionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 10px 40px rgba(0,0,0,0.08);">
+        <div class="modal-header" style="border-bottom:1px solid var(--border-color);padding:24px 32px;">
+          <h5 class="modal-title" style="font-weight:600;font-size:18px;">Nouvelle Intervention</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{% url 'ajouter_intervention' dossier.pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body" style="padding:32px;">
+                <div class="mb-3">
+                    <label style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Titre</label>
+                    <input type="text" name="titre" class="form-control" placeholder="Ex: Plaidoirie, Réunion client..." required style="border-radius:8px;border:1px solid var(--border-color);padding:12px 16px;font-size:14px;">
+                </div>
+                <div class="mb-3">
+                    <label style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Description</label>
+                    <textarea name="description" class="form-control" rows="3" required placeholder="Détails de l'intervention..." style="border-radius:8px;border:1px solid var(--border-color);padding:12px 16px;font-size:14px;"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Date & Heure</label>
+                    <input type="datetime-local" name="date_intervention" class="form-control" required style="border-radius:8px;border:1px solid var(--border-color);padding:12px 16px;font-size:14px;">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6c757d;display:block;margin-bottom:8px;">Document joint (optionnel)</label>
+                    <input type="file" name="document_joint" class="form-control" style="border-radius:8px;border:1px solid var(--border-color);padding:10px 16px;font-size:14px;">
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--border-color);padding:20px 32px;">
+              <button type="button" class="btn-outline" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" class="btn-premium" style="height:40px;margin-left:12px;">Enregistrer</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}

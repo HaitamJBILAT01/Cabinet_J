@@ -1,0 +1,210 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Audiences - Cabinet JBILAT{% endblock %}
+
+{% block extra_head %}
+<style>
+    .luxe-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    .btn-action-luxe {
+        background: linear-gradient(135deg, #b8935a 0%, #96733f 100%);
+        color: #ffffff !important;
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(184, 147, 90, 0.25);
+        letter-spacing: 0.5px;
+    }
+    .btn-action-luxe:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #96733f 0%, #75562d 100%);
+        box-shadow: 0 6px 18px rgba(184, 147, 90, 0.4) !important;
+        color: #ffffff;
+    }
+    .filter-pill {
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        border: 1px solid #ede9e1;
+        background: white;
+        color: var(--ink);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .filter-pill.active, .filter-pill:hover {
+        background: var(--ink);
+        color: white;
+        border-color: var(--ink);
+    }
+    .audience-row:hover {
+        background-color: #fcfbf9 !important;
+    }
+    .badge-upcoming { background-color: #e8f5e9; color: #2e7d32; }
+    .badge-past { background-color: #f1f3f5; color: #6c757d; }
+    .badge-today { background-color: #fff3e0; color: #e65100; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 fade-up">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="brand-font fw-bold mb-1" style="color: var(--ink); font-size: 2.2rem;">Audiences</h2>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Calendrier des audiences et audiences passées</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'audience_create' %}" class="btn btn-action-luxe d-flex align-items-center" style="border-radius: 8px;">
+                <i class="fa-solid fa-plus me-2"></i>
+                <span>Nouvelle Audience</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtres & Recherche -->
+    <div class="luxe-card p-3 mb-4 border-top border-3" style="border-color: var(--gold) !important;">
+        <form method="GET" action="">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0" style="color: var(--gold);">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0"
+                               placeholder="Rechercher par tribunal, dossier ou client..."
+                               value="{{ search_query }}">
+                        <input type="hidden" name="filtre" value="{{ filtre }}">
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <a href="?filtre=toutes" class="filter-pill {% if filtre == 'toutes' %}active{% endif %}">Toutes</a>
+                    <a href="?filtre=a_venir" class="filter-pill {% if filtre == 'a_venir' %}active{% endif %}">À venir</a>
+                    <a href="?filtre=passees" class="filter-pill {% if filtre == 'passees' %}active{% endif %}">Passées</a>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-cabinet w-100" style="border-radius: 8px;">Filtrer</button>
+                    {% if search_query %}
+                    <a href="?filtre={{ filtre }}" class="btn btn-light border text-muted" style="border-radius: 8px;" title="Réinitialiser">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="luxe-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #fcfbf9; border-bottom: 2px solid #ede9e1;">
+                    <tr class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                        <th class="ps-4 py-3">Date & Heure</th>
+                        <th class="py-3">Dossier</th>
+                        <th class="py-3">Client</th>
+                        <th class="py-3">Tribunal</th>
+                        <th class="py-3">Salle</th>
+                        <th class="py-3">Statut</th>
+                        <th class="text-end pe-4 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audience in audiences %}
+                    <tr class="audience-row" style="border-bottom: 1px solid #f1f3f5;">
+                        <td class="ps-4 py-3">
+                            <div class="fw-bold" style="color: var(--ink); font-size: 0.9rem;">
+                                {{ audience.date_audience|date:"d/m/Y" }}
+                            </div>
+                            <div class="text-muted" style="font-size: 0.78rem;">
+                                <i class="fa-regular fa-clock me-1"></i>{{ audience.date_audience|date:"H:i" }}
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <a href="{% url 'dossier_detail' audience.dossier.pk %}" class="text-decoration-none fw-medium" style="color: var(--ink); font-size: 0.9rem;">
+                                {{ audience.dossier.titre }}
+                            </a>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-scale-unbalanced me-1" style="color: var(--gold);"></i>
+                                {{ audience.dossier.type_affaire }}
+                            </div>
+                        </td>
+                        <td class="py-3 text-muted" style="font-size: 0.85rem;">
+                            <i class="fa-regular fa-user me-1"></i>
+                            {{ audience.dossier.client }}
+                        </td>
+                        <td class="py-3 fw-medium" style="font-size: 0.88rem; color: var(--ink);">
+                            {{ audience.tribunal }}
+                        </td>
+                        <td class="py-3 text-muted" style="font-size: 0.85rem;">
+                            {{ audience.salle|default:"—" }}
+                        </td>
+                        <td class="py-3">
+                            {% if audience.date_audience.date == today %}
+                                <span class="badge badge-today px-3 py-1" style="border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                                    ⚡ Aujourd'hui
+                                </span>
+                            {% elif audience.date_audience.date > today %}
+                                <span class="badge badge-upcoming px-3 py-1" style="border-radius: 6px; font-size: 0.75rem; font-weight: 500;">
+                                    À venir
+                                </span>
+                            {% else %}
+                                <span class="badge badge-past px-3 py-1" style="border-radius: 6px; font-size: 0.75rem;">
+                                    Passée
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4 py-3">
+                            <div class="btn-group shadow-sm" style="border-radius: 8px;">
+                                <a href="{% url 'audience_update' audience.pk %}" class="btn btn-sm btn-light border-end text-secondary px-3" title="Modifier">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="{% url 'audience_delete' audience.pk %}" class="btn btn-sm btn-light text-danger px-3" title="Supprimer">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted mb-3">
+                                <i class="fa-solid fa-gavel fa-3x" style="opacity: 0.12;"></i>
+                            </div>
+                            <h5 class="brand-font fw-bold mb-1" style="color: var(--ink);">Aucune audience trouvée</h5>
+                            <p class="text-muted" style="font-size: 0.9rem;">Planifiez une nouvelle audience pour commencer.</p>
+                            <a href="{% url 'audience_create' %}" class="btn btn-cabinet mt-2 shadow-sm" style="border-radius: 8px;">
+                                Planifier une audience
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if is_paginated %}
+        <div class="d-flex justify-content-between align-items-center p-3 border-top" style="background-color: #fcfbf9; border-radius: 0 0 12px 12px;">
+            <span class="text-muted fw-medium" style="font-size: 0.85rem;">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+            <div class="btn-group shadow-sm" style="border-radius: 8px;">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&filtre={{ filtre }}&q={{ search_query }}" class="btn btn-sm btn-white border text-gold px-3" style="background: white;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&filtre={{ filtre }}&q={{ search_query }}" class="btn btn-sm btn-white border text-gold px-3" style="background: white;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Gestion des Dossiers - Cabinet JBILAT{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Zwaq d-l-Cartes w j-Jdwel */
+    .luxe-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    
+    .badge-luxe {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+    .bg-sage-light { background-color: #e8f0eb; color: #4a6b5a; }
+    .bg-gray-light { background-color: #f1f3f5; color: #6c757d; }
+    
+    /* Inputs dyal Recherche */
+    .search-input:focus, .filter-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 0.25rem rgba(184, 147, 90, 0.15);
+    }
+    
+    /* Hover dyal stoura f j-jdwel */
+    .table-hover tbody tr:hover {
+        background-color: #fcfbf9 !important;
+        transition: background-color 0.2s ease;
+    }
+    /* 🎨 Zwaq dyal Bouton NOUVEAU DOSSIER */
+    .btn-action-luxe {
+        background: linear-gradient(135deg, #b8935a 0%, #96733f 100%);
+        color: #ffffff !important;
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(184, 147, 90, 0.25);
+        letter-spacing: 0.5px;
+    }
+    .btn-action-luxe:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #96733f 0%, #75562d 100%);
+        box-shadow: 0 6px 18px rgba(184, 147, 90, 0.4) !important;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 fade-up" style="animation: fadeIn 0.5s ease;">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="brand-font fw-bold mb-1" style="color: var(--ink); font-size: 2.2rem;">Dossiers</h2>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'dossier_create' %}" class="btn btn-action-luxe d-flex align-items-center" style="border-radius: 8px;">
+                <i class="fa-solid fa-folder-plus me-2" style="font-size: 1.1rem;"></i> 
+                <span>Nouveau Dossier</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="luxe-card p-3 mb-4 border-top border-3" style="border-color: var(--gold) !important;">
+        <form method="GET" action="">
+            <div class="row g-2">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0" style="color: var(--gold);">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 search-input ps-0" 
+                               placeholder="Rechercher par Titre, Client ou N° de dossier..." 
+                               value="{{ search_query|default:'' }}">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <select name="statut" class="form-select filter-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="En cours" {% if selected_statut == 'En cours' %}selected{% endif %}>En cours</option>
+                        <option value="Clôturé" {% if selected_statut == 'Clôturé' %}selected{% endif %}>Clôturé</option>
+                        <option value="Archivé" {% if selected_statut == 'Archivé' %}selected{% endif %}>Archivé</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-cabinet w-100" style="border-radius: 8px;">Filtrer</button>
+                    {% if search_query or selected_statut %}
+                        <a href="{% url 'dossier_list' %}" class="btn btn-light border text-muted" title="Réinitialiser" style="border-radius: 8px;">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="luxe-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #fcfbf9; border-bottom: 2px solid #ede9e1;">
+                    <tr class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                        <th class="ps-4 py-3">N°</th>
+                        <th class="py-3">Titre de l'affaire</th>
+                        <th class="py-3">Client Associé</th>
+                        <th class="py-3">Statut</th>
+                        <th class="text-end pe-4 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dossier in dossiers %}
+                    <tr style="border-bottom: 1px solid #f1f3f5;">
+                        
+                        <td class="ps-4 py-3 fw-bold" style="color: var(--gold); font-family: 'DM Sans', sans-serif;">
+                            #{{ dossier.id }}
+                        </td>
+                        
+                        <td class="py-3">
+                            <div class="fw-bold" style="color: var(--ink); font-size: 0.95rem;">
+                                {{ dossier.titre }}
+                            </div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-scale-unbalanced me-1" style="color: var(--gold);"></i> 
+                                {{ dossier.type_affaire }}
+                            </div>
+                        </td>
+                        
+                        <td class="py-3 text-muted fw-medium" style="font-size: 0.85rem;">
+                            <i class="fa-regular fa-user me-1" style="opacity: 0.7;"></i> 
+                            {% if dossier.client %}
+                                {{ dossier.client }}
+                            {% else %}
+                                <span class="fst-italic">Aucun client</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="py-3">
+                            <span class="badge-luxe {% if dossier.statut == 'En cours' %}bg-sage-light{% else %}bg-gray-light{% endif %}" style="font-size: 0.75rem;">
+                                {{ dossier.statut }}
+                            </span>
+                        </td>
+                        
+                        <td class="text-end pe-4 py-3">
+                            <div class="btn-group shadow-sm" style="border-radius: 8px;">
+                                <a href="{% url 'dossier_detail' dossier.id %}" class="btn btn-sm btn-light border-end text-gold px-3" title="Ouvrir le dossier">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </a>
+                                <a href="{% url 'dossier_update' dossier.id %}" class="btn btn-sm btn-light text-secondary px-3" title="Modifier les informations">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted mb-3">
+                                <i class="fa-solid fa-folder-open fa-3x" style="opacity: 0.15;"></i>
+                            </div>
+                            <h5 class="brand-font fw-bold mb-1" style="color: var(--ink);">Aucun dossier trouvé</h5>
+                            <p class="text-muted" style="font-size: 0.9rem;">Essayez de modifier votre recherche ou ajoutez un nouveau dossier.</p>
+                            <a href="{% url 'dossier_create' %}" class="btn btn-cabinet mt-2 shadow-sm" style="border-radius: 8px;">
+                                Ouvrir un dossier
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if is_paginated %}
+    <div class="d-flex justify-content-between align-items-center mt-3 p-3 border-top" style="background-color: #fcfbf9; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+        <span class="text-muted fw-medium" style="font-size: 0.85rem;">
+            Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+        </span>
+        <div class="btn-group shadow-sm" style="border-radius: 8px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_statut %}&statut={{ selected_statut }}{% endif %}" class="btn btn-sm btn-white border text-gold px-3" style="background: white;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_statut %}&statut={{ selected_statut }}{% endif %}" class="btn btn-sm btn-white border text-gold px-3" style="background: white;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    </div>
+
+</div>
+
+<style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
